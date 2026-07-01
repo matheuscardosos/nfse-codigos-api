@@ -8,7 +8,7 @@ from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
 from fastapi.openapi.docs import get_redoc_html
 
-ROOT = Path(__file__).parent.parent
+ROOT = Path(__file__).parent
 with open(ROOT / "codigos.json", encoding="utf-8") as f:
     CODIGOS = json.load(f)
 
