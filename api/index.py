@@ -5,8 +5,7 @@ import time
 from collections import defaultdict
 from pathlib import Path
 from fastapi import FastAPI, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
 from fastapi.openapi.docs import get_redoc_html
 
 ROOT = Path(__file__).parent.parent
@@ -56,7 +55,13 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
-app.mount("/public", StaticFiles(directory=ROOT / "public"), name="public")
+@app.get("/public/favicon.ico", include_in_schema=False)
+def favicon():
+    return FileResponse(ROOT / "public" / "favicon.ico", media_type="image/x-icon")
+
+@app.get("/public/vercel.svg", include_in_schema=False)
+def vercel_svg():
+    return FileResponse(ROOT / "public" / "vercel.svg", media_type="image/svg+xml")
 
 
 def normalizar(texto: str) -> str:
