@@ -1,23 +1,12 @@
-import base64
 import json
 import unicodedata
 import re
 import time
 from collections import defaultdict
-from pathlib import Path
 from fastapi import FastAPI, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.openapi.docs import get_redoc_html
-
-ROOT = Path(__file__).parent
-with open(ROOT / "codigos.json", encoding="utf-8") as f:
-    CODIGOS = json.load(f)
-
-with open(ROOT / "public" / "favicon.ico", "rb") as f:
-    _FAVICON_BYTES = f.read()
-
-with open(ROOT / "public" / "vercel.svg", encoding="utf-8") as f:
-    _VERCEL_SVG = f.read()
+from api._assets import FAVICON_BYTES as _FAVICON_BYTES, VERCEL_SVG as _VERCEL_SVG, CODIGOS
 
 # Rate limiting em memoria: 60 requisicoes por minuto por IP
 LIMITE_RPM = 60
@@ -105,7 +94,12 @@ def redoc():
     response_description="Lista completa de códigos de tributação nacional",
 )
 def download_json():
-    return FileResponse(ROOT / "codigos.json", media_type="application/json", filename="ctribnac-codigos.json")
+    import json as _json
+    return Response(
+        _json.dumps(CODIGOS, ensure_ascii=False, indent=2),
+        media_type="application/json",
+        headers={"Content-Disposition": "attachment; filename=ctribnac-codigos.json"},
+    )
 
 
 @app.get(
