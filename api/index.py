@@ -1,3 +1,4 @@
+import base64
 import json
 import unicodedata
 import re
@@ -11,6 +12,12 @@ from fastapi.openapi.docs import get_redoc_html
 ROOT = Path(__file__).parent
 with open(ROOT / "codigos.json", encoding="utf-8") as f:
     CODIGOS = json.load(f)
+
+with open(ROOT / "public" / "favicon.ico", "rb") as f:
+    _FAVICON_BYTES = f.read()
+
+with open(ROOT / "public" / "vercel.svg", encoding="utf-8") as f:
+    _VERCEL_SVG = f.read()
 
 # Rate limiting em memoria: 60 requisicoes por minuto por IP
 LIMITE_RPM = 60
@@ -57,11 +64,11 @@ app = FastAPI(
 
 @app.get("/public/favicon.ico", include_in_schema=False)
 def favicon():
-    return FileResponse(ROOT / "public" / "favicon.ico", media_type="image/x-icon")
+    return Response(_FAVICON_BYTES, media_type="image/x-icon", headers={"Cache-Control": "public, max-age=86400"})
 
 @app.get("/public/vercel.svg", include_in_schema=False)
 def vercel_svg():
-    return FileResponse(ROOT / "public" / "vercel.svg", media_type="image/svg+xml")
+    return Response(_VERCEL_SVG, media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=86400"})
 
 
 def normalizar(texto: str) -> str:
